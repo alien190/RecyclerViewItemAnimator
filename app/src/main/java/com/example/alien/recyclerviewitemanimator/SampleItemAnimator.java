@@ -48,14 +48,21 @@ public class SampleItemAnimator extends DefaultItemAnimator {
         final TextInfo preColorTextInfo = (TextInfo) preInfo;
         final TextInfo postColorTextInfo = (TextInfo) postInfo;
 
-        ObjectAnimator fadeToBlack = ObjectAnimator.ofArgb(holder.mTextView, "backgroundColor", Color.TRANSPARENT, Color.GRAY);
-        ObjectAnimator fadeFromBlack = ObjectAnimator.ofArgb(holder.mTextView, "backgroundColor", Color.GRAY, Color.TRANSPARENT);
+
+        int colorPrimary = oldHolder.itemView.getContext().getResources().getColor(R.color.colorPrimary);
+
+        ObjectAnimator fadeToBlack = ObjectAnimator.ofArgb(holder.mTextView,
+                "textColor", colorPrimary, Color.TRANSPARENT);
+        ObjectAnimator fadeFromBlack = ObjectAnimator.ofArgb(holder.mTextView,
+                "textColor", Color.TRANSPARENT, colorPrimary);
         AnimatorSet bgAnim = new AnimatorSet();
         bgAnim.playSequentially(fadeToBlack, fadeFromBlack);
 
-        ObjectAnimator oldTextRotate = ObjectAnimator.ofFloat(holder.mTextView, View.ROTATION_X, 0, 90);
-        ObjectAnimator newTextRotate = ObjectAnimator.ofFloat(holder.mTextView, View.ROTATION_X, -90, 0);
-        oldTextRotate.addListener(new AnimatorListenerAdapter() {
+        int width = oldHolder.itemView.getWidth();
+
+        ObjectAnimator oldTextMove = ObjectAnimator.ofFloat(holder.mTextView, View.X, 0, width);
+        ObjectAnimator newTextMove = ObjectAnimator.ofFloat(holder.mTextView, View.X, -width, 0);
+        oldTextMove.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 holder.mTextView.setText(preColorTextInfo.text);
@@ -67,7 +74,7 @@ public class SampleItemAnimator extends DefaultItemAnimator {
             }
         });
         AnimatorSet textAnim = new AnimatorSet();
-        textAnim.playSequentially(oldTextRotate, newTextRotate);
+        textAnim.playSequentially(oldTextMove, newTextMove);
 
         AnimatorSet overallAnim = new AnimatorSet();
         overallAnim.playTogether(bgAnim, textAnim);
