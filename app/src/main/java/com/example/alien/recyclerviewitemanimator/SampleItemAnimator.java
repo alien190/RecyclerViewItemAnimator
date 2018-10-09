@@ -5,10 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
+import android.support.animation.DynamicAnimation;
+import android.support.animation.FlingAnimation;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import java.util.List;
 
@@ -50,18 +54,28 @@ public class SampleItemAnimator extends DefaultItemAnimator {
 
 
         int colorPrimary = oldHolder.itemView.getContext().getResources().getColor(R.color.colorPrimary);
+        AccelerateInterpolator accelerateInterpolator = new AccelerateInterpolator(0.8f);
+        DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(0.8f);
 
         ObjectAnimator fadeToBlack = ObjectAnimator.ofArgb(holder.mTextView,
                 "textColor", colorPrimary, Color.TRANSPARENT);
+        fadeToBlack.setInterpolator(accelerateInterpolator);
+        fadeToBlack.setDuration(1500);
         ObjectAnimator fadeFromBlack = ObjectAnimator.ofArgb(holder.mTextView,
                 "textColor", Color.TRANSPARENT, colorPrimary);
+        fadeFromBlack.setInterpolator(decelerateInterpolator);
+        fadeFromBlack.setDuration(1500);
         AnimatorSet bgAnim = new AnimatorSet();
         bgAnim.playSequentially(fadeToBlack, fadeFromBlack);
 
         int width = oldHolder.itemView.getWidth();
 
         ObjectAnimator oldTextMove = ObjectAnimator.ofFloat(holder.mTextView, View.X, 0, width);
+        oldTextMove.setInterpolator(accelerateInterpolator);
+        oldTextMove.setDuration(1500);
         ObjectAnimator newTextMove = ObjectAnimator.ofFloat(holder.mTextView, View.X, -width, 0);
+        newTextMove.setInterpolator(decelerateInterpolator);
+        newTextMove.setDuration(1500);
         oldTextMove.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -78,6 +92,7 @@ public class SampleItemAnimator extends DefaultItemAnimator {
 
         AnimatorSet overallAnim = new AnimatorSet();
         overallAnim.playTogether(bgAnim, textAnim);
+        //overallAnim.playTogether(textAnim);
         overallAnim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
